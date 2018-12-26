@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:annotation-config />
+    <aop:aspectj-autoproxy />
+    <context:component-scan base-package="com.spring.aop"/>
+
+    <bean id="fundTransfer" class="com.spring.aop.aspects.FundTransfer"/>
+    <bean id="logging" class="com.spring.aop.aspects.Logging"/>
+    <bean id="transaction" class="com.spring.aop.aspects.Transaction"/>
+    <bean id="account" class="com.spring.aop.Account"/>
+
+
+
+    <aop:config>
+        <aop:pointcut id="PC1" expression="execution(* com.spring.aop.Account.updateAccount())"/>
+        <aop:aspect id="loggingAspect" ref="logging">
+        <aop:around method="beginLogging" pointcut-ref="PC1"/>
+    </aop:aspect>
+        <aop:aspect id="transactionAspect" ref="transaction">
+            <aop:after-throwing method="rollbackTransaction" throwing="dataAccessException"  pointcut-ref="PC1"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
